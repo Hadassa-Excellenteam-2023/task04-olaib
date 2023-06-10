@@ -29,10 +29,9 @@ namespace
 	FunMap initFunctionsMap()
 	{
 		auto map = FunMap();
-
-		map[L1] = &manhatanDistance;
+		map[L2] = &manhatanDistance;
 		map[Linf] = &infiniteDistance;
-		map[L1] = &manhatanDistance;
+		map[L1] = &euclidianDistance;
 
 		return map;
 	}

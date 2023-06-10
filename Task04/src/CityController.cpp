@@ -14,7 +14,7 @@ namespace {
         };
        auto minX = cityLoc.x - radius;
        auto maxX = cityLoc.x + radius;
-       auto maxY = cityLoc.x + radius;
+       auto maxY = cityLoc.y + radius;
        auto minY = cityLoc.y - radius;
 
        auto itBeginX = mapX.lower_bound(Location(minX, cityLoc.y));
