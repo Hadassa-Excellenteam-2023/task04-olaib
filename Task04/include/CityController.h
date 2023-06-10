@@ -5,16 +5,17 @@
 
 class CityController {
 public:
+	// ====================== C-TOR ===========================
 	CityController();
-	std::string getCityName()const;
-	void printResList(Location mapped, const lessXMap& pairs);
+	
 	void run();
 private:
+	// ================= PRIVATE MEMBERS ======================
 	CityMap m_citiesMap;
 	MapX m_mapX;
 	MapY m_mapY;
-
 	double m_radius;
-
-	void initCitiesMap();
+	// ================= PRIVATE METHODS ======================
+	std::string getCityName()const;
+	void printResList(Location mapped, const SquareMap& pairs);
 };

@@ -7,6 +7,6 @@ bool operator<(const Location& loc1, const Location& loc2)
 
 std::ostream& operator<<(std::ostream& os, const Location& loc)
 {
-	os << "[" << loc.x << ", " << loc.y << ")";
+	os << "(" << loc.x << ", " << loc.y << ")";
 	return os;
 }

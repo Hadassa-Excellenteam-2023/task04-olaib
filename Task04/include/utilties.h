@@ -10,7 +10,7 @@
 #include "Location.h"
 
 
-using LocationStrPair = std::pair<const Location&, const std::string&>;
+using LocationStrPair = std::pair<Location, std::string>;
 using CityMap = std::unordered_map<std::string, Location>;
 using MapX = std::multimap<Location, std::string, LessX>;
 using MapY = std::multimap<Location, std::string, LessY>;
@@ -34,6 +34,7 @@ constexpr auto TAB_SPACE = '\t';
 
 inline const char* FILE_OPEN_ERR = "Cannot open file: ";
 inline const char* FILE_READ_ERR = "Cannot read file: ";
+inline const char* EMPTY_FILE = "File is empty";
 inline const char* INVALID_INPUT = "Invalid input";
 
 constexpr auto UNKNOWN_ERROR = "Unknown error";

@@ -5,32 +5,35 @@
 
 //todo: check how this will work well - the it - equal range??
 namespace {
-    void squareByRadius(const Location& cityLoc, SquareMap& sqaureMape, const MapX& mapX, const MapY& mapy, const double& radius)
+    // Calculate the square within the given radius
+    void squareByRadius(const Location& cityLoc, lessXMap& sqaureMap, const MapX& mapX, const MapY& mapY, const double& radius)
     {
-        static const auto ComapreFunc = [](const LocationStrPair& p1, const LocationStrPair& p2)
+       static const auto ComapreFunc = [](const LocationStrPair& pair1, const LocationStrPair& pair2)
         {
-            return p1.first.x < p2.first.x;
+            return pair1.first.x < pair2.first.x;
         };
-        auto x = cityLoc.x;
-        auto y = cityLoc.y;
-        auto itRangeX = mapX.equal_range(Location(x - radius, y));
-        auto itRangeY = mapy.equal_range(Location(x, y - radius));
+       auto minX = cityLoc.x - radius;
+       auto maxX = cityLoc.x + radius;
+       auto maxY = cityLoc.x + radius;
+       auto minY = cityLoc.y - radius;
 
-        auto subMmapY = lessXMap();
-        for (auto it = itRangeY.first; it != itRangeY.second; ++it) {
-            if (it->first.y <= y + radius) {
-                subMmapY.insert(*it);
-            }
-            else {
-                break;
-            }
-        }
+       auto itBeginX = mapX.lower_bound(Location(minX, cityLoc.y));
+       auto itEndX = mapX.upper_bound(Location(maxX, cityLoc.y));
+       //
+       const auto subMapY = lessXMap(
+           mapY.lower_bound(Location(cityLoc.x, minY)),//itBeginY
+           mapY.upper_bound(Location(cityLoc.x, maxY))//itEndY
+       );
 
-        std::set_intersection(itRangeX.first, itRangeX.second, subMmapY.begin(), subMmapY.end(),
-            std::inserter(sqaureMape, sqaureMape.begin()), ComapreFunc);
+       std::set_intersection(
+           itBeginX, itEndX,
+           subMapY.begin(), subMapY.end(),
+           std::inserter(sqaureMap, sqaureMap.begin()), ComapreFunc
+       );
+
     }
-
-    void sortedSquare(const Location& cityLoc, FunctionPtr distFuncPtr, const SquareMap& squareMap, lessXMap& sortedSquare)
+    // Sort the square map based on distance
+    void sortedSquare(const Location& cityLoc, FunctionPtr distFuncPtr, const lessXMap& squareMap, SquareMap& sortedSquare)
     {
         const auto DistClacFunc = [&sortedSquare, distFuncPtr, cityLoc](const LocationStrPair& locStrP)
         {
@@ -46,8 +49,7 @@ namespace {
 CityController::CityController()
 {
     try {
-        readCityInfo(DATA_FILE_NAME,m_mapX,m_mapY,m_citiesMap);
-        initCitiesMap();
+        readCityInfo(DATA_FILE_NAME, m_mapX, m_mapY, m_citiesMap);
     }
     catch (const std::exception& e)
     {
@@ -65,8 +67,7 @@ void CityController::run()
 {
     std::string city;
 
-    try
-    {
+    try {
         while ((city = getCityName()) != END)
         {
             readRadiusInput(m_radius);
@@ -74,10 +75,10 @@ void CityController::run()
             auto distanceFunc = getDistFunction();
 
             auto& cityLoc = m_citiesMap.at(city);
-            auto sortedSquareMap = lessXMap();
-            auto squareMap = SquareMap();
+            auto squareMap = lessXMap();
+            auto sortedSquareMap = SquareMap();
 
-            // create square radius
+            // create square by given radius
             squareByRadius(cityLoc, squareMap, m_mapX, m_mapY, m_radius);
             // create sorted square
             sortedSquare(cityLoc, distanceFunc, squareMap, sortedSquareMap);
@@ -86,8 +87,9 @@ void CityController::run()
             printResList(cityLoc, sortedSquareMap);
             clearInput();
         }
+
     }
-    catch(std::invalid_argument& e)
+    catch (std::invalid_argument& e)
     {
         std::cout << e.what() << std::endl;
         throw e;
@@ -125,7 +127,7 @@ std::string CityController::getCityName() const
 
 // =============================================================================
 
-void CityController::printResList(Location cityLoc, const lessXMap& sortedSquare)
+void CityController::printResList(Location cityLoc, const SquareMap& sortedSquare)
 {
     auto nearestCities = ++sortedSquare.cbegin();
     auto farestCities = sortedSquare.upper_bound(m_radius);// circle
